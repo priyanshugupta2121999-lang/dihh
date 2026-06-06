@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dihh Calculator – World's Most Scientific Size Estimator</title>
+<meta name="description" content="Upload your photo for an AI-powered dihh size assessment. Totally scientific. Completely serious. Free forever.">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07070e;--card:#0f0f1c;--card2:#161628;
+  --a1:#ff4d00;--a2:#ffcc00;--a3:#00e5ff;--a4:#ff007a;
+  --text:#f5f5f5;--muted:#666;--border:#1e1e38;
+
+  /* Pearl silver palette */
+  --pearl-base:#e8e8f0;
+  --pearl-light:#f8f8ff;
+  --pearl-mid:#c8c8d8;
+  --pearl-dark:#a0a0b8;
+  --pearl-deep:#7070a0;
+  --pearl-shine:#ffffff;
+  --pearl-iridescent1:#d4e8ff;
+  --pearl-iridescent2:#ffd4f0;
+  --pearl-iridescent3:#d4ffd4;
+}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+/* animated bg */
+.bg-orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.18;animation:drift 12s ease-in-out infinite alternate;}
+.orb1{width:400px;height:400px;background:#ff4d00;top:-100px;left:-100px;animation-delay:0s;}
+.orb2{width:350px;height:350px;background:#ffcc00;bottom:-80px;right:-80px;animation-delay:-4s;}
+.orb3{width:300px;height:300px;background:#00e5ff;top:40%;left:50%;animation-delay:-8s;}
+@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(40px,30px) scale(1.1)}}
+
+/* grid lines */
+.grid{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);
+  background-size:40px 40px;}
+
+.wrap{position:relative;z-index:1;max-width:700px;margin:0 auto;padding:1rem 1rem 4rem;}
+
+/* HEADER — Pearl Silver Treatment */
+.hdr{text-align:center;padding:2.5rem 0 1.5rem;position:relative;}
+.hdr-eyebrow{font-size:.7rem;letter-spacing:4px;color:var(--pearl-mid);text-transform:uppercase;font-weight:900;margin-bottom:.5rem;}
+
+/* Pearl/Nacre shimmer on the main title */
+.hdr h1{
+  font-family:'Bebas Neue',cursive;font-size:5rem;line-height:.9;
+  letter-spacing:2px;
+  position:relative;
+  display:inline-block;
+}
+.hdr h1 .title-text{
+  background: linear-gradient(
+    105deg,
+    var(--pearl-deep) 0%,
+    var(--pearl-mid) 15%,
+    var(--pearl-light) 28%,
+    var(--pearl-iridescent1) 35%,
+    var(--pearl-shine) 42%,
+    var(--pearl-iridescent2) 50%,
+    var(--pearl-light) 58%,
+    var(--pearl-iridescent3) 65%,
+    var(--pearl-shine) 72%,
+    var(--pearl-mid) 82%,
+    var(--pearl-base) 90%,
+    var(--pearl-dark) 100%
+  );
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  background-size:300% 100%;
+  animation:pearlShimmer 4s ease-in-out infinite;
+  filter:drop-shadow(0 2px 8px rgba(200,200,255,.3));
+}
+
+@keyframes pearlShimmer{
+  0%{background-position:100% 50%}
+  50%{background-position:0% 50%}
+  100%{background-position:100% 50%}
+}
+
+/* Pearl lustre border under title */
+.hdr h1::after{
+  content:'';
+  display:block;
+  height:3px;
+  margin:6px auto 0;
+  width:80%;
+  background:linear-gradient(90deg,
+    transparent,
+    var(--pearl-deep),
+    var(--pearl-shine),
+    var(--pearl-iridescent1),
+    var(--pearl-shine),
+    var(--pearl-iridescent2),
+    var(--pearl-shine),
+    var(--pearl-deep),
+    transparent
+  );
+  background-size:200% 100%;
+  animation:pearlShimmer 3s ease-in-out infinite;
+  border-radius:2px;
+  filter:blur(.5px);
+}
+
+.hdr-sub{font-size:.85rem;color:var(--muted);margin-top:.5rem;letter-spacing:1px;}
+.hdr-line{width:60px;height:2px;background:linear-gradient(90deg,var(--a1),var(--a2));margin:1rem auto 0;border-radius:2px;}
+
+/* NAV TABS */
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:1.2rem;}
+.tab{
+  padding:.6rem .5rem;border:1px solid var(--border);border-radius:10px;
+  cursor:pointer;font-family:'Nunito',sans-serif;font-weight:900;font-size:.78rem;
+  color:var(--muted);background:var(--card);transition:all .2s;text-align:center;
+  letter-spacing:.5px;text-transform:uppercase;
+}
+.tab.active{border-color:var(--a1);color:var(--a1);background:rgba(255,77,0,.08);}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:1.5rem;margin-bottom:1rem;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,77,0,.03),transparent 60%);pointer-events:none;}
+
+/* NAME */
+.name-hero{text-align:center;padding:.5rem 0;}
+.name-hero h2{font-family:'Bebas Neue',cursive;font-size:2.2rem;color:var(--a2);letter-spacing:2px;margin-bottom:.3rem;}
+.name-hero p{color:var(--muted);font-size:.88rem;margin-bottom:1.5rem;line-height:1.6;}
+.inp{
+  width:100%;padding:.85rem 1.1rem;
+  background:#09091a;border:1.5px solid var(--border);
+  border-radius:12px;color:var(--text);font-family:'Nunito',sans-serif;
+  font-size:1.1rem;font-weight:700;transition:border-color .2s;outline:none;
+}
+.inp:focus{border-color:var(--a1);}
+.inp-row{display:flex;gap:.5rem;margin-top:.6rem;}
+.sel{
+  flex:1;padding:.85rem .8rem;background:#09091a;border:1.5px solid var(--border);
+  border-radius:12px;color:var(--text);font-family:'Nunito',sans-serif;
+  font-size:.9rem;font-weight:700;outline:none;cursor:pointer;
+}
+.sel:focus{border-color:var(--a1);}
+
+/* BUTTONS */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:.8rem 1.8rem;background:linear-gradient(135deg,#ff4d00,#cc3d00);
+  color:#fff;font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:900;
+  border:none;border-radius:12px;cursor:pointer;transition:transform .15s,box-shadow .15s;
+  letter-spacing:.5px;text-transform:uppercase;
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,77,0,.35);}
+.btn:active{transform:scale(.97);}
+.btn-gold{background:linear-gradient(135deg,#ffcc00,#e6a800);color:#000;box-shadow:none;}
+.btn-gold:hover{box-shadow:0 8px 24px rgba(255,204,0,.35);}
+.btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--muted);padding:.65rem 1.3rem;font-size:.82rem;}
+.btn-ghost:hover{border-color:var(--a1);color:var(--a1);box-shadow:none;transform:none;}
+.btn-sm{padding:.5rem 1rem;font-size:.78rem;}
+.btn-skip{
+  background:transparent;border:1.5px dashed var(--muted);color:var(--muted);
+  padding:.6rem 1.3rem;font-size:.8rem;font-family:'Nunito',sans-serif;
+  font-weight:700;border-radius:12px;cursor:pointer;transition:all .2s;
+  letter-spacing:.5px;text-transform:uppercase;display:inline-flex;align-items:center;gap:5px;
+}
+.btn-skip:hover{border-color:var(--a3);color:var(--a3);}
+
+/* DROP ZONE */
+.drop-zone{
+  border:2px dashed var(--border);border-radius:14px;padding:2.5rem 1rem;
+  text-align:center;cursor:pointer;transition:all .2s;position:relative;
+  background:rgba(9,9,26,.5);
+}
+.drop-zone.drag-over{border-color:var(--a3);background:rgba(0,229,255,.04);}
+.drop-zone.has-img{border-color:var(--a1);border-style:solid;}
+.drop-icon{font-size:3rem;display:block;margin-bottom:.5rem;}
+.drop-text{font-weight:700;font-size:1rem;margin-bottom:.25rem;}
+.drop-sub{color:var(--muted);font-size:.8rem;}
+.img-preview{width:100%;max-height:220px;object-fit:cover;border-radius:10px;margin-top:.5rem;}
+#file-inp{display:none;}
+
+/* SAFETY NOTICE BADGE */
+.safety-badge{
+  display:flex;align-items:flex-start;gap:.6rem;
+  background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.2);
+  border-radius:10px;padding:.65rem .9rem;margin:.6rem 0 .9rem;
+}
+.safety-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px;}
+.safety-text{font-size:.75rem;color:#9cd4e0;line-height:1.6;font-weight:700;}
+.safety-text strong{color:var(--a3);display:block;margin-bottom:2px;}
+
+/* SCAN ANIMATION */
+.scan-wrap{position:relative;border-radius:12px;overflow:hidden;margin-top:.5rem;}
+.scan-line{
+  position:absolute;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--a3),transparent);
+  animation:scanMove 1.2s ease-in-out infinite;z-index:2;
+}
+@keyframes scanMove{0%{top:0;opacity:1}100%{top:100%;opacity:.3}}
+.scan-corners span{position:absolute;width:14px;height:14px;border-color:var(--a3);border-style:solid;}
+.scan-corners .tl{top:8px;left:8px;border-width:2px 0 0 2px;}
+.scan-corners .tr{top:8px;right:8px;border-width:2px 2px 0 0;}
+.scan-corners .bl{bottom:8px;left:8px;border-width:0 0 2px 2px;}
+.scan-corners .br{bottom:8px;right:8px;border-width:0 2px 2px 0;}
+
+/* PROGRESS */
+.prog-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin:.75rem 0 .3rem;}
+.prog-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--a1),var(--a2));transition:width .1s linear;}
+.prog-label{font-size:.78rem;color:var(--a3);font-weight:700;letter-spacing:.5px;}
+
+/* QUESTIONS */
+.q-dots{display:flex;gap:5px;margin-bottom:1rem;}
+.q-dot{flex:1;height:3px;background:var(--border);border-radius:2px;transition:background .3s;}
+.q-dot.done{background:var(--a1);}
+.q-dot.now{background:var(--a2);}
+.q-num{font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--a1);font-weight:900;margin-bottom:.3rem;}
+.q-text{font-size:1.05rem;font-weight:900;margin-bottom:.2rem;line-height:1.4;}
+.q-hint{font-size:.78rem;color:var(--muted);margin-bottom:1rem;font-style:italic;}
+.q-opts{display:flex;flex-direction:column;gap:.45rem;}
+.q-opt{
+  padding:.7rem 1rem;background:var(--card2);border:1.5px solid var(--border);
+  border-radius:10px;cursor:pointer;font-family:'Nunito',sans-serif;
+  font-size:.88rem;font-weight:700;color:var(--text);text-align:left;
+  transition:all .15s;
+}
+.q-opt:hover{border-color:var(--a1);color:var(--a1);background:rgba(255,77,0,.06);}
+.q-opt.sel{border-color:var(--a2);color:var(--a2);background:rgba(255,204,0,.07);}
+
+/* RESULT */
+.result-top{text-align:center;padding:.5rem 0 1rem;}
+.result-crown{font-size:4rem;display:block;animation:bounce .6s ease infinite alternate;margin-bottom:.2rem;}
+@keyframes bounce{from{transform:translateY(0)}to{transform:translateY(-10px)}}
+
+/* CONGRATS LINE */
+.congrats-line{
+  font-size:.8rem;font-weight:900;letter-spacing:3px;text-transform:uppercase;
+  color:var(--a3);margin-bottom:.3rem;opacity:.9;
+}
+
+/* BIG NAME LINE */
+.congrats-name{
+  font-family:'Bebas Neue',cursive;font-size:2.6rem;line-height:1;
+  color:var(--text);letter-spacing:1px;margin-bottom:.15rem;
+}
+
+/* "YOUR DIHH IS" label */
+.dihh-label{
+  font-family:'Bebas Neue',cursive;
+  font-size:clamp(2rem,8vw,3.2rem);
+  font-weight:900;letter-spacing:5px;text-transform:uppercase;
+  color:var(--a3);margin-bottom:.1rem;display:block;
+  text-shadow:0 0 24px rgba(0,229,255,.6),0 0 60px rgba(0,229,255,.2);
+  animation:labelPulse 2s ease-in-out infinite alternate;
+}
+@keyframes labelPulse{
+  from{opacity:.85;text-shadow:0 0 18px rgba(0,229,255,.5);}
+  to{opacity:1;text-shadow:0 0 32px rgba(0,229,255,.9),0 0 70px rgba(0,229,255,.3);}
+}
+
+/* THE BIG TITLE — the main event */
+.result-title{
+  font-family:'Bebas Neue',cursive;
+  font-size:clamp(4.5rem,22vw,9.5rem);
+  line-height:.88;
+  letter-spacing:4px;
+  display:block;
+  background:linear-gradient(
+    120deg,
+    var(--a1) 0%,
+    var(--a2) 30%,
+    #fff 50%,
+    var(--a2) 70%,
+    var(--a4) 100%
+  );
+  background-size:250% 100%;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  animation:titleShine 2.5s ease-in-out infinite;
+  filter:drop-shadow(0 0 32px rgba(255,204,0,.55)) drop-shadow(0 4px 16px rgba(255,77,0,.4));
+  margin:.2rem 0 .6rem;
+  word-break:break-word;
+}
+@keyframes titleShine{
+  0%{background-position:100% 50%}
+  50%{background-position:0% 50%}
+  100%{background-position:100% 50%}
+}
+
+/* glow ring around the whole announcement */
+.result-announce{
+  background:linear-gradient(135deg,rgba(255,77,0,.08),rgba(255,204,0,.06),rgba(255,0,122,.06));
+  border:2px solid rgba(255,204,0,.25);
+  border-radius:20px;
+  padding:1.5rem 1rem 1rem;
+  margin-bottom:.75rem;
+  position:relative;
+  overflow:hidden;
+}
+.result-announce::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(255,204,0,.12),transparent 70%);
+  pointer-events:none;
+}
+
+/* confetti dots */
+.confetti{position:absolute;top:0;left:0;right:0;height:100%;pointer-events:none;overflow:hidden;}
+.confetti span{
+  position:absolute;top:-10px;width:7px;height:7px;border-radius:2px;
+  animation:fall linear infinite;
+}
+@keyframes fall{
+  0%{top:-10px;opacity:1;transform:rotate(0deg)}
+  100%{top:110%;opacity:0;transform:rotate(360deg)}
+}
+
+.result-sub{
+  display:inline-block;border:1.5px solid var(--a3);color:var(--a3);
+  font-size:.75rem;font-weight:900;padding:3px 14px;border-radius:20px;
+  letter-spacing:2px;text-transform:uppercase;margin-bottom:.75rem;
+}
+.result-desc{color:#ccc;font-size:.9rem;line-height:1.7;margin-bottom:1rem;}
+
+/* METRICS GRID */
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:1rem 0;}
+.metric{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:.7rem .5rem;text-align:center;}
+.metric-val{font-family:'Bebas Neue',cursive;font-size:1.6rem;color:var(--a2);line-height:1;}
+.metric-lbl{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+
+/* VERDICT METER */
+.meter-wrap{margin:1rem 0;}
+.meter-lbl{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted);margin-bottom:.3rem;}
+.meter{height:10px;background:var(--border);border-radius:5px;overflow:hidden;}
+.meter-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,#ff4d00,#ffcc00,#00e5ff);transition:width 1.5s cubic-bezier(.22,1,.36,1);}
+
+/* SCAN ANALYSIS */
+.analysis-rows{margin:1rem 0;}
+.a-row{display:flex;align-items:center;gap:.75rem;padding:.45rem 0;border-bottom:1px solid var(--border);}
+.a-row:last-child{border:none;}
+.a-key{font-size:.75rem;color:var(--muted);width:120px;flex-shrink:0;font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.a-bar{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.a-fill{height:100%;border-radius:3px;transition:width 1s ease;}
+.a-val{font-size:.75rem;font-weight:900;width:36px;text-align:right;color:var(--a2);}
+
+/* LEADERBOARD */
+.country-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem;}
+.ctab{
+  padding:.4rem .9rem;border:1px solid var(--border);border-radius:20px;
+  font-size:.75rem;font-weight:900;color:var(--muted);cursor:pointer;
+  background:var(--card2);transition:all .2s;
+}
+.ctab.active{border-color:var(--a2);color:var(--a2);background:rgba(255,204,0,.07);}
+.lb-hdr{display:grid;grid-template-columns:32px 1fr 100px 80px;gap:8px;padding:.4rem .5rem;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:700;}
+.lb-row{display:grid;grid-template-columns:32px 1fr 100px 80px;gap:8px;align-items:center;padding:.55rem .5rem;border-radius:10px;transition:background .15s;}
+.lb-row:hover{background:rgba(255,77,0,.04);}
+.lb-sep{border-bottom:1px solid var(--border);margin:.2rem 0;}
+.lb-rank{font-family:'Bebas Neue',cursive;font-size:1.2rem;text-align:center;}
+.lb-rank.g{color:#ffd700;}.lb-rank.s{color:#c0c0c0;}.lb-rank.b{color:#cd7f32;}.lb-rank.r{color:var(--muted);}
+.lb-name{font-weight:700;font-size:.88rem;}
+.lb-flag{font-size:.9rem;margin-right:4px;}
+.lb-ttl{font-size:.72rem;color:var(--a3);font-weight:700;}
+.lb-score{font-family:'Bebas Neue',cursive;font-size:1rem;color:var(--a1);text-align:right;}
+.lb-empty{text-align:center;color:var(--muted);padding:2.5rem 1rem;font-size:.9rem;}
+
+/* COUNTRY PODIUM */
+.podium{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem;}
+.pod{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:.75rem .5rem;text-align:center;}
+.pod-flag{font-size:2rem;display:block;margin-bottom:.2rem;}
+.pod-name{font-size:.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;}
+.pod-score{font-family:'Bebas Neue',cursive;font-size:1.8rem;color:var(--a2);line-height:1;}
+.pod.first{border-color:var(--a2);background:rgba(255,204,0,.05);}
+.pod.second{border-color:#c0c0c0;background:rgba(192,192,192,.03);}
+.pod.third{border-color:#cd7f32;background:rgba(205,127,50,.03);}
+
+/* FACE PREVIEW BADGE (shown on result if photo used) */
+.face-thumb{
+  width:48px;height:48px;border-radius:50%;object-fit:cover;
+  border:2px solid var(--a1);vertical-align:middle;
+  display:inline-block;margin-right:.5rem;box-shadow:0 0 14px rgba(255,77,0,.3);
+}
+.no-photo-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(255,77,0,.07);border:1px solid rgba(255,77,0,.2);
+  border-radius:20px;padding:3px 12px;font-size:.72rem;color:var(--a1);font-weight:700;
+  margin-bottom:.6rem;
+}
+
+.row{display:flex;gap:.5rem;align-items:center;}
+.row-c{display:flex;gap:.5rem;align-items:center;justify-content:center;}
+.mt{margin-top:1rem;}
+.disclaimer{font-size:.68rem;color:var(--muted);text-align:center;margin-top:2.5rem;line-height:1.7;opacity:.5;}
+</style>
+</head>
+<body>
+<div class="bg-orbs"><div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div></div>
+<div class="grid"></div>
+<div class="wrap">
+
+<div class="hdr">
+  <p class="hdr-eyebrow">The Internet's Most Trusted</p>
+  <h1><span class="title-text">Dihh<br>Calculator</span></h1>
+  <p class="hdr-sub">Photo Analysis · 5-Question Assessment · Global Leaderboard</p>
+  <div class="hdr-line"></div>
+</div>
+
+<div id="app"></div>
+
+<p class="disclaimer">
+  100% satire · No real facial recognition · All results randomly generated for comedy purposes only<br>
+  📸 Photos analyzed locally in your browser only — nothing is uploaded or stored anywhere · Made with questionable life choices
+</p>
+</div>
+
+<script>
+const COUNTRIES = [
+  {code:'IN',name:'India',flag:'🇮🇳'},
+  {code:'US',name:'USA',flag:'🇺🇸'},
+  {code:'BR',name:'Brazil',flag:'🇧🇷'},
+  {code:'NG',name:'Nigeria',flag:'🇳🇬'},
+  {code:'JP',name:'Japan',flag:'🇯🇵'},
+  {code:'DE',name:'Germany',flag:'🇩🇪'},
+  {code:'MX',name:'Mexico',flag:'🇲🇽'},
+  {code:'KR',name:'Korea',flag:'🇰🇷'},
+  {code:'GB',name:'UK',flag:'🇬🇧'},
+  {code:'AU',name:'Australia',flag:'🇦🇺'},
+  {code:'IT',name:'Italy',flag:'🇮🇹'},
+  {code:'FR',name:'France',flag:'🇫🇷'},
+];
+
+const TITLES = [
+  {id:'tic_tac',name:'Tic Tac',emoji:'🍬',color:'#aaffee',pct:5,
+   desc:"Ah. A Tic Tac. Refreshing, small, and comes in a pack of 100. Nobody opens the packet just for one. Carried in a pocket. Rattles when you walk.",
+   metrics:{symmetry:18,confidence:44,energy:62}},
+  {id:'pinky',name:'Little Pinky',emoji:'🤙',color:'#99ccff',pct:12,
+   desc:"The pinky finger. Delicate. Decorative. Raised while drinking tea. It doesn't do most of the heavy lifting but it completes the hand. Respectfully.",
+   metrics:{symmetry:30,confidence:55,energy:70}},
+  {id:'pocket',name:'Pocket Rocket',emoji:'🚀',color:'#00e5ff',pct:20,
+   desc:"Compact. Efficient. Surprisingly powerful for its class. Like a sports car parked in a Smart Car body. Don't underestimate it — people have been shocked.",
+   metrics:{symmetry:42,confidence:88,energy:95}},
+  {id:'citizen',name:'Respectable Citizen',emoji:'🎩',color:'#4dff91',pct:32,
+   desc:"You are the median. The pillar of society. The bar chart everyone is compared against. Perfectly adequate in every measurable dimension. Your parents are proud.",
+   metrics:{symmetry:65,confidence:62,energy:58}},
+  {id:'above_avg',name:'Above Average',emoji:'📈',color:'#88ff88',pct:45,
+   desc:"You are statistically distinguished. 45% of people look at this number and feel something. You are the reason averages feel bad about themselves.",
+   metrics:{symmetry:70,confidence:72,energy:68}},
+  {id:'legend',name:'Neighborhood Legend',emoji:'🏅',color:'#ffcc00',pct:58,
+   desc:"People have heard rumors. Some of them are true. You walk into a room and the vibe shifts. Not everyone knows why. Those who know, know.",
+   metrics:{symmetry:78,confidence:84,energy:79}},
+  {id:'massive',name:'Massive',emoji:'💪',color:'#ffaa00',pct:68,
+   desc:"The word 'massive' was invented for situations like this. Scientists use it in papers. It requires its own paragraph. Twice-confirmed by independent reviewers.",
+   metrics:{symmetry:83,confidence:88,energy:84}},
+  {id:'bazooka',name:'Bazooka',emoji:'💥',color:'#ff6600',pct:77,
+   desc:"Military grade. Shoulder-mounted. Requires a two-person crew for safe operation. The government has been notified. Clearance required. Do not point at civilians.",
+   metrics:{symmetry:87,confidence:92,energy:90}},
+  {id:'infra',name:'Infrastructure Project',emoji:'🏗️',color:'#ff4d00',pct:84,
+   desc:"Requires permits. Environmental impact assessment pending. The city council was informed. Load-bearing in ways that concern structural engineers and delight everyone else.",
+   metrics:{symmetry:89,confidence:91,energy:87}},
+  {id:'weapon',name:'Weapon of Mass',emoji:'☢️',color:'#ff2200',pct:90,
+   desc:"UN resolution pending. Several countries have filed formal complaints. Geologists have recorded tremors. FEMA issued a preparedness bulletin. Handle responsibly.",
+   metrics:{symmetry:93,confidence:96,energy:94}},
+  {id:'mythical',name:'Mythical Beast',emoji:'🐉',color:'#cc00ff',pct:95,
+   desc:"Ancient texts describe this. Cave paintings match. Historians debate its existence but eyewitnesses are consistent. Carbon-dated. Peer reviewed. Genuinely feared.",
+   metrics:{symmetry:96,confidence:98,energy:97}},
+  {id:'national',name:'National Asset',emoji:'👑',color:'#ff007a',pct:99,
+   desc:"Government classified. Under international protection. Scientists have requested a research grant. You are a UNESCO heritage site. The UN is aware of your existence.",
+   metrics:{symmetry:99,confidence:100,energy:100}},
+];
+
+const QUESTIONS = [
+  {q:"Your shoe size?",hint:"The one true metric. Science agrees.",
+   opts:[{t:"Under 8 — efficiency is a virtue",v:1},{t:"8–10 — perfectly proportioned",v:2},{t:"10–12 — built different",v:3},{t:"12+ — I buy online only",v:4}]},
+  {q:"You eat a banana:",hint:"Totally a dietary question. Nothing else.",
+   opts:[{t:"Carefully. In private. Lights off.",v:1},{t:"Like a normal functioning adult",v:2},{t:"In one go, eye contact maintained",v:3},{t:"I don't eat bananas. I respect them.",v:4}]},
+  {q:"How do you parallel park?",hint:"Spatial awareness assessment in progress.",
+   opts:[{t:"3 attempts, 1 prayer, mild panic",v:1},{t:"Forward in like a civilian",v:2},{t:"Reverse perfect, first try",v:3},{t:"Into a gap 1.5cm bigger than my car",v:4}]},
+  {q:"Your ex texts 'hey' at 2am:",hint:"Character evaluation module running.",
+   opts:[{t:"Screenshot everything, call 3 friends",v:1},{t:"Leave on read for exactly 72 hours",v:2},{t:"Reply 'new phone who dis'",v:3},{t:"Already blocked 6 months ago. Next.",v:4}]},
+  {q:"Pick your spirit vehicle:",hint:"Ancient wisdom. Trust the algorithm.",
+   opts:[{t:"Mini Cooper — cute, compact, fierce",v:1},{t:"Sedan — reliable, no complaints",v:2},{t:"F-150 — functional intimidation",v:3},{t:"Semi truck — I carry others' burdens",v:4}]},
+];
+
+const SCAN_MSGS = [
+  "Detecting facial bone structure...",
+  "Measuring nose bridge ratio...",
+  "Analyzing jaw-to-forehead ratio...",
+  "Computing brightness coefficient...",
+  "Scanning chromatic variance...",
+  "Cross-referencing with global database...",
+  "Running vibes algorithm v4.2...",
+  "Consulting the ancient scrolls...",
+  "Almost done (not really but soon)...",
+  "Finalizing highly scientific verdict...",
+];
+
+let S = {
+  tab:'calc', screen:'name',
+  name:'', country:'IN',
+  imgData:null, imgFile:null,
+  scanPct:0, scanMsg:'', scanTimer:null,
+  answers:[], qIdx:0,
+  result:null, imgMetrics:null,
+  lbCountry:'IN', leaderboard:[], countryCounts:{}
+};
+
+/* ── storage ── */
+async function loadData(){
+  try{
+    const r = await window.storage.get('dihh_v3_lb',true);
+    if(r) S.leaderboard = JSON.parse(r.value);
+  }catch(e){S.leaderboard=[];}
+  try{
+    const r = await window.storage.get('dihh_v3_cc',true);
+    if(r) S.countryCounts = JSON.parse(r.value);
+  }catch(e){S.countryCounts={};}
+}
+async function saveData(){
+  try{ await window.storage.set('dihh_v3_lb',JSON.stringify(S.leaderboard),true); }catch(e){}
+  try{ await window.storage.set('dihh_v3_cc',JSON.stringify(S.countryCounts),true); }catch(e){}
+}
+
+/* ── image pixel analysis ── */
+function analyzeImage(file, cb){
+  const img = new Image();
+  const url = URL.createObjectURL(file);
+  img.onload = ()=>{
+    const c = document.createElement('canvas');
+    const size = 80;
+    c.width = c.height = size;
+    const ctx = c.getContext('2d');
+    ctx.drawImage(img,0,0,size,size);
+    const d = ctx.getImageData(0,0,size,size).data;
+    let r=0,g=0,b=0,bright=0,contrast=0,samples=0;
+    const vals=[];
+    for(let i=0;i<d.length;i+=4){
+      r+=d[i]; g+=d[i+1]; b+=d[i+2];
+      const lum=(d[i]*.299+d[i+1]*.587+d[i+2]*.114);
+      bright+=lum; vals.push(lum); samples++;
+    }
+    r/=samples; g/=samples; b/=samples; bright/=samples;
+    const mean=bright;
+    vals.forEach(v=>{contrast+=Math.pow(v-mean,2);});
+    contrast=Math.sqrt(contrast/samples);
+    const warmth = (r-b)/255;
+    const saturation = (Math.max(r,g,b)-Math.min(r,g,b))/255;
+    URL.revokeObjectURL(url);
+    cb({brightness:bright/255, contrast:contrast/128, warmth, saturation, r:r/255, g:g/255, b:b/255});
+  };
+  img.src = url;
+}
+
+function imgToResult(m, qScore){
+  const imgScore = (m.brightness*0.3 + m.contrast*0.4 + m.saturation*0.3);
+  const combined = (imgScore * 0.4) + (qScore/20 * 0.6);
+  const idx = Math.min(Math.floor(combined * TITLES.length), TITLES.length-1);
+  const nose = Math.round(50 + m.contrast*40 + Math.random()*10);
+  const sym  = Math.round(40 + m.brightness*50 + Math.random()*10);
+  const warm = Math.round(30 + (m.warmth+1)/2*60 + Math.random()*10);
+  const energy = Math.round(45 + m.saturation*45 + Math.random()*10);
+  return {
+    title: TITLES[idx],
+    bars:[
+      {k:'Nose Ratio',v:Math.min(nose,99),c:'#ff4d00'},
+      {k:'Symmetry',v:Math.min(sym,99),c:'#ffcc00'},
+      {k:'Warmth Index',v:Math.min(warm,99),c:'#ff007a'},
+      {k:'Energy Field',v:Math.min(energy,99),c:'#00e5ff'},
+    ]
+  };
+}
+
+/* ── scan sequence ── */
+function startScan(){
+  S.scanPct=0; let msgIdx=0;
+  S.scanMsg=SCAN_MSGS[0];
+  S.scanTimer = setInterval(()=>{
+    S.scanPct += Math.random()*3.5+1;
+    if(S.scanPct>=100){
+      S.scanPct=100;
+      clearInterval(S.scanTimer);
+      analyzeImage(S.imgFile, metrics=>{
+        S.imgMetrics = metrics;
+        setTimeout(()=>{ S.screen='questions'; S.qIdx=0; S.answers=[]; render(); },400);
+      });
+    }
+    msgIdx = Math.min(Math.floor(S.scanPct/10),SCAN_MSGS.length-1);
+    S.scanMsg = SCAN_MSGS[msgIdx];
+    const pb = document.getElementById('pb');
+    const pl = document.getElementById('pl');
+    if(pb) pb.style.width = Math.min(S.scanPct,100)+'%';
+    if(pl) pl.textContent = S.scanMsg;
+  },90);
+}
+
+/* ── scoring ── */
+function pickAnswer(v){
+  S.answers[S.qIdx]=v;
+  if(S.qIdx<QUESTIONS.length-1){ S.qIdx++; render(); }
+  else {
+    const qScore = S.answers.reduce((a,b)=>a+b,0);
+    const r = imgToResult(S.imgMetrics||{brightness:.5,contrast:.5,warmth:0,saturation:.5}, qScore);
+    S.result = r;
+    S.screen='result';
+    render();
+    setTimeout(()=>{
+      const mf = document.getElementById('mfill');
+      if(mf) mf.style.width = r.title.pct+'%';
+      r.bars.forEach((bar,i)=>{
+        const el = document.getElementById('abar'+i);
+        if(el) setTimeout(()=>{ el.style.width=bar.v+'%'; },i*150);
+      });
+    },120);
+  }
+}
+
+function submitLB(){
+  const entry={
+    name:S.name, country:S.country,
+    title:S.result.title.name,
+    emoji:S.result.title.emoji,
+    pct:S.result.title.pct,
+    ts:Date.now()
+  };
+  S.leaderboard.unshift(entry);
+  S.leaderboard.sort((a,b)=>b.pct-a.pct);
+  S.leaderboard = S.leaderboard.slice(0,200);
+  S.countryCounts[S.country]=(S.countryCounts[S.country]||0)+1;
+  saveData();
+  S.lbCountry=S.country; S.tab='lb'; render();
+}
+
+function reset(){
+  if(S.scanTimer) clearInterval(S.scanTimer);
+  S.screen='name'; S.imgData=null; S.imgFile=null;
+  S.answers=[]; S.qIdx=0; S.result=null; S.imgMetrics=null;
+  render();
+}
+
+function skipPhoto(){
+  S.imgData=null; S.imgFile=null;
+  S.imgMetrics={brightness:Math.random(),contrast:Math.random(),warmth:Math.random()-.5,saturation:Math.random()};
+  S.screen='questions'; S.qIdx=0; S.answers=[]; render();
+}
+
+/* ── drag & drop ── */
+function setupDrop(){
+  const dz = document.getElementById('dz');
+  const fi = document.getElementById('fi');
+  if(!dz||!fi) return;
+  dz.addEventListener('click',()=>fi.click());
+  dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag-over');});
+  dz.addEventListener('dragleave',()=>dz.classList.remove('drag-over'));
+  dz.addEventListener('drop',e=>{
+    e.preventDefault();dz.classList.remove('drag-over');
+    const f=e.dataTransfer.files[0];
+    if(f&&f.type.startsWith('image/')) loadImg(f);
+  });
+  fi.addEventListener('change',e=>{
+    const f=e.target.files[0];
+    if(f) loadImg(f);
+  });
+}
+
+function loadImg(f){
+  S.imgFile=f;
+  const r=new FileReader();
+  r.onload=e=>{S.imgData=e.target.result; render(); setupDrop();};
+  r.readAsDataURL(f);
+}
+
+/* ── render ── */
+function render(){
+  document.getElementById('app').innerHTML = buildHTML();
+  attachEv();
+}
+
+function buildHTML(){
+  const tabs=`<div class="tabs">
+    <button class="tab${S.tab==='calc'?' active':''}" onclick="setTab('calc')">📏 Calculator</button>
+    <button class="tab${S.tab==='lb'?' active':''}" onclick="setTab('lb')">🏆 Leaderboard</button>
+    <button class="tab${S.tab==='globe'?' active':''}" onclick="setTab('globe')">🌍 Countries</button>
+  </div>`;
+  if(S.tab==='lb') return tabs+renderLB();
+  if(S.tab==='globe') return tabs+renderGlobe();
+  if(S.screen==='name') return tabs+renderName();
+  if(S.screen==='scan') return tabs+renderScan();
+  if(S.screen==='questions') return tabs+renderQ();
+  if(S.screen==='result') return tabs+renderResult();
+  return tabs;
+}
+
+function renderName(){
+  const cOpts = COUNTRIES.map(c=>`<option value="${c.code}"${S.country===c.code?' selected':''}>${c.flag} ${c.name}</option>`).join('');
+  return `<div class="card">
+    <div class="name-hero">
+      <h2>⚗️ Begin Assessment</h2>
+      <p>Drop your photo, answer 5 questions.<br>Our algorithm will do the rest.<br><span style="color:var(--a1);font-weight:900">Zero judgment. Maximum comedy.</span></p>
+    </div>
+    <input id="name-inp" class="inp" type="text" placeholder="Your name..." value="${esc(S.name)}" maxlength="28">
+    <div class="inp-row">
+      <select id="country-sel" class="sel">${cOpts}</select>
+    </div>
+    <div style="height:.75rem"></div>
+
+    <div class="safety-badge">
+      <span class="safety-icon">🔒</span>
+      <div class="safety-text">
+        <strong>Your photo stays 100% private</strong>
+        It's analyzed entirely in your browser using pixel math only. No upload, no server, no storage — the image never leaves your device. We just look at colors and brightness, not your face.
+      </div>
+    </div>
+
+    <div id="dz" class="drop-zone${S.imgData?' has-img':''}">
+      <input type="file" id="fi" accept="image/*">
+      ${S.imgData
+        ? `<div class="scan-wrap"><img src="${S.imgData}" class="img-preview"><div class="scan-corners"><span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span></div></div><p style="margin-top:.5rem;font-size:.78rem;color:var(--a3);font-weight:700">✓ Photo loaded — tap to change</p>`
+        : `<span class="drop-icon">📸</span><p class="drop-text">Drop your face photo here</p><p class="drop-sub">or tap to upload · stays on your device</p>`}
+    </div>
+
+    <div style="height:.75rem"></div>
+    <div class="row-c" style="gap:.75rem;flex-wrap:wrap;">
+      <button class="btn" onclick="beginFlow()">Start Analysis →</button>
+      <button class="btn-skip" onclick="skipPhoto()">⚡ Skip Photo</button>
+    </div>
+    <p style="font-size:.7rem;color:var(--muted);text-align:center;margin-top:.6rem">Skipping photo? The algorithm will use its imagination. Results may vary wildly.</p>
+  </div>`;
+}
+
+function renderScan(){
+  return `<div class="card">
+    <p style="font-size:.7rem;letter-spacing:2px;color:var(--a3);text-transform:uppercase;font-weight:900;margin-bottom:.5rem">Phase 1 of 2 — Facial Scan</p>
+    <h2 style="font-family:'Bebas Neue',cursive;font-size:1.8rem;color:var(--text);letter-spacing:1px;margin-bottom:.25rem">Analyzing ${esc(S.name)}'s Face</h2>
+    <p style="color:var(--muted);font-size:.82rem;margin-bottom:.5rem">Processing pixel data using our proprietary algorithm. Science.</p>
+    <div class="safety-badge" style="margin-bottom:.75rem">
+      <span class="safety-icon">🛡️</span>
+      <div class="safety-text"><strong>Processing locally</strong>Your photo is being analyzed right here in your browser. Zero data transmitted.</div>
+    </div>
+    ${S.imgData?`<div class="scan-wrap" style="margin-bottom:.75rem">
+      <img src="${S.imgData}" class="img-preview" style="max-height:180px">
+      <div class="scan-line"></div>
+      <div class="scan-corners"><span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span></div>
+    </div>`:''}
+    <div class="prog-bar"><div class="prog-fill" id="pb" style="width:0%"></div></div>
+    <p class="prog-label" id="pl">Initializing...</p>
+  </div>`;
+}
+
+function renderQ(){
+  const q=QUESTIONS[S.qIdx];
+  const dots=QUESTIONS.map((_,i)=>`<div class="q-dot${i<S.qIdx?' done':i===S.qIdx?' now':''}"></div>`).join('');
+  const opts=q.opts.map(o=>`<button class="q-opt${S.answers[S.qIdx]===o.v?' sel':''}" onclick="pickAnswer(${o.v})">${o.t}</button>`).join('');
+  return `<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+      <p class="q-num">Question ${S.qIdx+1} / ${QUESTIONS.length}</p>
+      <span style="font-size:.75rem;color:var(--a2);font-weight:900">${esc(S.name)} 👋</span>
+    </div>
+    <div class="q-dots">${dots}</div>
+    <p class="q-text">${q.q}</p>
+    <p class="q-hint">${q.hint}</p>
+    <div class="q-opts">${opts}</div>
+    <p style="font-size:.7rem;color:var(--muted);margin-top:.75rem;text-align:center">Phase 2 of 2 · Personality Vector Analysis</p>
+  </div>`;
+}
+
+function renderResult(){
+  const t=S.result.title;
+  const bars=S.result.bars.map((b,i)=>`<div class="a-row">
+    <span class="a-key">${b.k}</span>
+    <div class="a-bar"><div class="a-fill" id="abar${i}" style="width:0%;background:${b.c}"></div></div>
+    <span class="a-val">${b.v}</span>
+  </div>`).join('');
+  const c=COUNTRIES.find(x=>x.code===S.country)||COUNTRIES[0];
+  const faceEl = S.imgData
+    ? `<img src="${S.imgData}" class="face-thumb" title="Your photo — never left your device" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:3px solid var(--a2);box-shadow:0 0 24px rgba(255,204,0,.45);display:block;margin:0 auto .75rem;">`
+    : `<span class="no-photo-badge" style="margin-bottom:.75rem">📵 Pure vibes mode — no photo</span>`;
+
+  // confetti colours
+  const confettiColors=['#ff4d00','#ffcc00','#00e5ff','#ff007a','#ffffff','#4dff91'];
+  const confettiHTML = Array.from({length:18},(_,i)=>{
+    const col=confettiColors[i%confettiColors.length];
+    const left=Math.round(Math.random()*100);
+    const delay=(Math.random()*3).toFixed(1);
+    const dur=(2+Math.random()*2).toFixed(1);
+    return `<span style="left:${left}%;background:${col};animation-duration:${dur}s;animation-delay:${delay}s;border-radius:${Math.random()>.5?'50%':'2px'}"></span>`;
+  }).join('');
+
+  return `<div class="card" style="overflow:visible">
+
+    <!-- BIG ANNOUNCEMENT BLOCK -->
+    <div class="result-announce">
+      <div class="confetti">${confettiHTML}</div>
+
+      <div class="result-top" style="position:relative;z-index:1">
+        <span class="result-crown">${t.emoji}</span>
+
+        <p class="congrats-line">🎉 Congratulations, ${esc(S.name)}! 🎉</p>
+
+        ${faceEl}
+
+        <span class="dihh-label">Your Dihh Is...</span>
+        <span class="result-title" style="background:linear-gradient(120deg,${t.color},#fff 50%,${t.color});-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;background-size:250% 100%;filter:drop-shadow(0 0 32px ${t.color}88) drop-shadow(0 4px 16px ${t.color}55);">${t.name}</span>
+        <div style="margin:.4rem 0 .2rem;display:flex;align-items:center;justify-content:center;gap:.5rem">
+          <span style="font-size:.65rem;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--muted)">TIER</span>
+          <span style="font-family:'Bebas Neue',cursive;font-size:1.4rem;color:${t.color};line-height:1;text-shadow:0 0 12px ${t.color}88">${TITLES.indexOf(t)+1} / ${TITLES.length}</span>
+          <span style="font-size:.65rem;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--muted)">· TOP ${100-t.pct}%</span>
+        </div>
+
+        <span class="result-sub">Certified by the Algorithm · ${c.flag} ${c.name}</span>
+        <p class="result-desc">${t.desc}</p>
+      </div>
+    </div>
+
+    <!-- ANALYSIS -->
+    <div class="card" style="background:var(--card2);margin:.5rem 0">
+      <p style="font-size:.7rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:.5rem">📊 ${S.imgData?'Facial Scan Analysis':'Vibe-Based Analysis'}</p>
+      <div class="analysis-rows">${bars}</div>
+    </div>
+
+    <!-- METER -->
+    <div class="meter-wrap">
+      <div class="meter-lbl"><span>Pocket Rocket</span><span>National Asset</span></div>
+      <div class="meter"><div class="meter-fill" id="mfill" style="width:0%"></div></div>
+      <p style="font-size:.7rem;color:var(--muted);margin-top:.3rem;text-align:center">Percentile: top ${100-t.pct}% globally</p>
+    </div>
+
+    <!-- METRICS -->
+    <div class="metrics">
+      <div class="metric"><div class="metric-val">${t.metrics.symmetry}</div><div class="metric-lbl">Symmetry</div></div>
+      <div class="metric"><div class="metric-val">${t.metrics.confidence}</div><div class="metric-lbl">Confidence</div></div>
+      <div class="metric"><div class="metric-val">${t.metrics.energy}</div><div class="metric-lbl">Energy</div></div>
+    </div>
+
+    <div class="row-c" style="gap:.5rem;flex-wrap:wrap;margin-top:.75rem">
+      <button class="btn btn-gold" onclick="submitLB()">🏆 Submit to ${c.flag} Leaderboard</button>
+      <button class="btn btn-ghost" onclick="reset()">Try Again</button>
+    </div>
+  </div>`;
+}
+
+function renderLB(){
+  const rows=S.leaderboard.filter(e=>e.country===S.lbCountry);
+  const c=COUNTRIES.find(x=>x.code===S.lbCountry)||COUNTRIES[0];
+  const cTabs=COUNTRIES.map(ct=>{
+    const cnt=S.leaderboard.filter(e=>e.country===ct.code).length;
+    if(cnt===0&&ct.code!==S.lbCountry&&ct.code!=='IN'&&ct.code!=='US'&&ct.code!=='BR') return '';
+    return `<button class="ctab${S.lbCountry===ct.code?' active':''}" onclick="setLBC('${ct.code}')">${ct.flag} ${ct.name} ${cnt>0?`(${cnt})`:''}</button>`;
+  }).filter(Boolean).join('');
+  const list=rows.length===0
+    ? `<div class="lb-empty">No entries for ${c.flag} ${c.name} yet.<br>Be the first to represent! 🫡</div>`
+    : `<div class="lb-hdr"><span></span><span>Name</span><span>Title</span><span style="text-align:right">Score</span></div>
+       <div class="lb-sep"></div>`+
+       rows.map((e,i)=>{
+         const rc=i===0?'g':i===1?'s':i===2?'b':'r';
+         const ri=i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}`;
+         return `<div class="lb-row">
+           <span class="lb-rank ${rc}">${ri}</span>
+           <span class="lb-name">${esc(e.name)}</span>
+           <span class="lb-ttl">${esc(e.emoji)} ${esc(e.title)}</span>
+           <span class="lb-score" style="text-align:right">${e.pct}%</span>
+         </div>`;
+       }).join('');
+  return `<div class="card">
+    <p style="font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--a1);font-weight:900;margin-bottom:.3rem">Global Rankings</p>
+    <p style="font-family:'Bebas Neue',cursive;font-size:1.8rem;letter-spacing:1px;color:var(--text);margin-bottom:.75rem">🏆 Hall of Fame</p>
+    <div class="country-tabs">${cTabs||COUNTRIES.slice(0,4).map(ct=>`<button class="ctab${S.lbCountry===ct.code?' active':''}" onclick="setLBC('${ct.code}')">${ct.flag} ${ct.name}</button>`).join('')}</div>
+    ${list}
+    <p style="font-size:.68rem;color:var(--muted);margin-top:.75rem;text-align:center">Rankings update in real-time · Shared globally · Sorted by dihh percentile</p>
+  </div>`;
+}
+
+function renderGlobe(){
+  const counts = COUNTRIES.map(c=>({...c,cnt:S.leaderboard.filter(e=>e.country===c.code).length}));
+  counts.sort((a,b)=>b.cnt-a.cnt);
+  const top3=counts.slice(0,3);
+  const podOrder=[1,0,2];
+  const podClass=['second','first','third'];
+  const podmedals=['🥈','🥇','🥉'];
+  const podCols=[top3[1],top3[0],top3[2]];
+  const podHTML=podCols.map((c,i)=>c?`<div class="pod ${podClass[i]}">
+    <span style="font-size:1.2rem">${podmedals[i]}</span>
+    <span class="pod-flag">${c.flag}</span>
+    <div class="pod-score">${c.cnt}</div>
+    <div class="pod-name">${c.name}</div>
+  </div>`:`<div class="pod"><span style="color:var(--muted);font-size:.8rem">TBD</span></div>`).join('');
+  const allRows=counts.map((c,i)=>`<div class="lb-row">
+    <span class="lb-rank ${i===0?'g':i===1?'s':i===2?'b':'r'}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</span>
+    <span class="lb-name">${c.flag} ${c.name}</span>
+    <span class="lb-ttl">${c.cnt} assessment${c.cnt!==1?'s':''}</span>
+    <span class="lb-score" style="text-align:right">${c.cnt}</span>
+  </div>`).join('');
+  return `<div class="card">
+    <p style="font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--a3);font-weight:900;margin-bottom:.3rem">Popcat-Style</p>
+    <p style="font-family:'Bebas Neue',cursive;font-size:1.8rem;letter-spacing:1px;color:var(--text);margin-bottom:1rem">🌍 Country Wars</p>
+    <div class="podium">${podHTML}</div>
+    <div class="lb-hdr" style="margin-top:.5rem"><span></span><span>Country</span><span>Entries</span><span style="text-align:right">Count</span></div>
+    <div class="lb-sep"></div>
+    ${allRows}
+    <p style="font-size:.68rem;color:var(--muted);margin-top:.75rem;text-align:center">Every submission counts toward your country's glory · Recruit your friends</p>
+  </div>`;
+}
+
+/* ── events ── */
+function attachEv(){
+  const ni=document.getElementById('name-inp');
+  const cs=document.getElementById('country-sel');
+  if(ni){ ni.addEventListener('input',e=>S.name=e.target.value); ni.addEventListener('keydown',e=>e.key==='Enter'&&beginFlow()); }
+  if(cs){ cs.addEventListener('change',e=>S.country=e.target.value); }
+  setupDrop();
+}
+
+function beginFlow(){
+  const ni=document.getElementById('name-inp');
+  const n=(ni?ni.value.trim():S.name);
+  if(!n){ni&&ni.focus();return;}
+  S.name=n;
+  if(!S.imgFile){
+    S.imgMetrics={brightness:Math.random(),contrast:Math.random(),warmth:Math.random()-.5,saturation:Math.random()};
+    S.screen='questions'; S.qIdx=0; S.answers=[]; render(); return;
+  }
+  S.screen='scan'; render();
+  setTimeout(startScan,300);
+}
+
+function setTab(t){S.tab=t;render();}
+function setLBC(c){S.lbCountry=c;render();}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+window.setTab=setTab; window.setLBC=setLBC;
+window.beginFlow=beginFlow; window.pickAnswer=pickAnswer;
+window.submitLB=submitLB; window.reset=reset; window.skipPhoto=skipPhoto;
+
+loadData().then(()=>render());
+</script>
+</body>
+</html>
