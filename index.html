@@ -412,7 +412,12 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 </p>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+const SUPABASE_URL = 'https://gvgvkwvenepuezcacdlr.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd2Z3Zrd3ZlbmVwdWV6Y2FjZGxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3ODMzMTQsImV4cCI6MjA5NjM1OTMxNH0.kCGT0GtiLIlmKZVLC1TnKuZ_K2Lz7MFsppYnEobIxLY';
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 const COUNTRIES = [
   {code:'IN',name:'India',flag:'🇮🇳'},
   {code:'US',name:'USA',flag:'🇺🇸'},
@@ -503,20 +508,40 @@ let S = {
   lbCountry:'IN', leaderboard:[], countryCounts:{}
 };
 
-/* ── storage ── */
+/* ── storage (Supabase) ── */
 async function loadData(){
   try{
-    const r = await window.storage.get('dihh_v3_lb',true);
-    if(r) S.leaderboard = JSON.parse(r.value);
-  }catch(e){S.leaderboard=[];}
-  try{
-    const r = await window.storage.get('dihh_v3_cc',true);
-    if(r) S.countryCounts = JSON.parse(r.value);
-  }catch(e){S.countryCounts={};}
+    const {data,error} = await db
+      .from('leaderboard')
+      .select('*')
+      .order('pct',{ascending:false})
+      .limit(200);
+    if(!error && data){
+      S.leaderboard = data.map(r=>({
+        name:r.name, country:r.country,
+        title:r.title, emoji:r.emoji,
+        pct:r.pct, ts:r.ts
+      }));
+      S.countryCounts={};
+      S.leaderboard.forEach(e=>{
+        S.countryCounts[e.country]=(S.countryCounts[e.country]||0)+1;
+      });
+    }
+  }catch(e){ S.leaderboard=[]; S.countryCounts={}; }
 }
+
 async function saveData(){
-  try{ await window.storage.set('dihh_v3_lb',JSON.stringify(S.leaderboard),true); }catch(e){}
-  try{ await window.storage.set('dihh_v3_cc',JSON.stringify(S.countryCounts),true); }catch(e){}
+  try{
+    const entry = {
+      name: S.leaderboard[0].name,
+      country: S.leaderboard[0].country,
+      title: S.leaderboard[0].title,
+      emoji: S.leaderboard[0].emoji,
+      pct: S.leaderboard[0].pct,
+      ts: S.leaderboard[0].ts
+    };
+    await db.from('leaderboard').insert([entry]);
+  }catch(e){}
 }
 
 /* ── image pixel analysis ── */
@@ -612,7 +637,7 @@ function pickAnswer(v){
   }
 }
 
-function submitLB(){
+async function submitLB(){
   const entry={
     name:S.name, country:S.country,
     title:S.result.title.name,
@@ -620,12 +645,19 @@ function submitLB(){
     pct:S.result.title.pct,
     ts:Date.now()
   };
+  // optimistically add to local state
   S.leaderboard.unshift(entry);
   S.leaderboard.sort((a,b)=>b.pct-a.pct);
   S.leaderboard = S.leaderboard.slice(0,200);
   S.countryCounts[S.country]=(S.countryCounts[S.country]||0)+1;
-  saveData();
   S.lbCountry=S.country; S.tab='lb'; render();
+  // save to Supabase
+  try{
+    await db.from('leaderboard').insert([entry]);
+    // reload fresh data from server
+    await loadData();
+    render();
+  }catch(e){}
 }
 
 function reset(){
